@@ -3,6 +3,8 @@ package com.example.Franchise.Management.System.dto;
 import java.sql.Date;
 
 public class CompanyPurchase {
+    private int companyPurchaseId;
+    private int productId;
     private String productName;
     private String productCompany;
     private int quantity;
@@ -11,7 +13,9 @@ public class CompanyPurchase {
     public CompanyPurchase() {
     }
 
-    public CompanyPurchase(String productName, String productCompany, int quantity, Date dateOfPurchase) {
+    public CompanyPurchase(int companyPurchaseId,int productId, String productName, String productCompany, int quantity, Date dateOfPurchase) {
+        this.companyPurchaseId = companyPurchaseId;
+        this.productId = productId;
         this.productName = productName;
         this.productCompany = productCompany;
         this.quantity = quantity;
@@ -48,5 +52,21 @@ public class CompanyPurchase {
 
     public void setDateOfPurchase(Date dateOfPurchase) {
         this.dateOfPurchase = dateOfPurchase;
+    }
+
+    public int getCompanyPurchaseId() {
+        return companyPurchaseId;
+    }
+
+    public void setCompanyPurchaseId(int companyPurchaseId) {
+        this.companyPurchaseId = companyPurchaseId;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 }

@@ -3,20 +3,26 @@ package com.example.Franchise.Management.System.dto;
 import java.sql.Date;
 
 public class Purchases {
+    private int purchaseId;
+    private int productId;
     private String productName;
-    private String companyName;
+    private String productCompany;
     private int quantity;
-    private String Location;
+    private String location;
     private String buildingName;
     private String userName;
+    private String userId;
     private Date dateOfPurchase;
 
-    public Purchases(String productName, String companyName, int quantity, String location, String buildingName, String userName, Date dateOfPurchase) {
+    public Purchases(int purchaseId, int productId, String productName, String productCompany, int quantity, String location, String buildingName, String userId, String userName, Date dateOfPurchase) {
+        this.purchaseId = purchaseId;
+        this.productId = productId;
         this.productName = productName;
-        this.companyName = companyName;
+        this.productCompany = productCompany;
         this.quantity = quantity;
-        Location = location;
+        this.location = location;
         this.buildingName = buildingName;
+        this.userId = userId;
         this.userName = userName;
         this.dateOfPurchase = dateOfPurchase;
     }
@@ -32,12 +38,12 @@ public class Purchases {
         this.productName = productName;
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public String getProductCompany() {
+        return productCompany;
     }
 
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
+    public void setProductCompany(String productCompany) {
+        this.productCompany = productCompany;
     }
 
     public int getQuantity() {
@@ -49,11 +55,11 @@ public class Purchases {
     }
 
     public String getLocation() {
-        return Location;
+        return location;
     }
 
     public void setLocation(String location) {
-        Location = location;
+        this.location = location;
     }
 
     public String getBuildingName() {
@@ -80,4 +86,27 @@ public class Purchases {
         this.dateOfPurchase = dateOfPurchase;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public int getPurchaseId() {
+        return purchaseId;
+    }
+
+    public void setPurchaseId(int purchaseId) {
+        this.purchaseId = purchaseId;
+    }
 }

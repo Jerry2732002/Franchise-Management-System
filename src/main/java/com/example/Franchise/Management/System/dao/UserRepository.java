@@ -1,8 +1,11 @@
 package com.example.Franchise.Management.System.dao;
 
 import com.example.Franchise.Management.System.dto.User;
+import com.example.Franchise.Management.System.rowmapper.AdminRowMapper;
 import com.example.Franchise.Management.System.rowmapper.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -21,7 +24,7 @@ public class UserRepository {
     public boolean addUser(User user) {
         String sql = "INSERT INTO users VALUES (?,?,?,?,?)";
 
-        int rowsAffected = jdbcTemplate.update(sql, user.getUserId(),user.getName(),user.getPassword(),user.getFranchiseId(),user.getRole());
+        int rowsAffected = jdbcTemplate.update(sql, user.getUserId(), user.getName(), user.getPassword(), user.getFranchiseId(), user.getRole());
 
         return rowsAffected == 1;
     }
@@ -36,8 +39,20 @@ public class UserRepository {
 
     public User getUserById(String userId) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new UserRowMapper(), userId);
+        } catch (EmptyResultDataAccessException exception) {
+            return null;
+        }
+    }
 
-        return jdbcTemplate.queryForObject(sql, new UserRowMapper(), userId);
+    public User getSuperAdminById(String userId) {
+        String sql = "SELECT * FROM users WHERE user_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new AdminRowMapper(), userId);
+        } catch (EmptyResultDataAccessException exception) {
+            return null;
+        }
     }
 
     public List<User> getAllUsers() {

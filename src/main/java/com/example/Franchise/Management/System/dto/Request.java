@@ -13,21 +13,16 @@ public class Request {
     private int quantity;
     private Status status;
 
-    public Request(int franchiseId, int productId, int quantity, Status status) {
+    public Request(int requestID, int franchiseId, int productId, String productName, String productCompany, String location, String buildingName, int quantity, String status) {
+        this.requestID = requestID;
         this.franchiseId = franchiseId;
         this.productId = productId;
-        this.quantity = quantity;
-        this.status = status;
-    }
-
-    public Request(int requestID, String productName, String productCompany, String location, String buildingName, int quantity, Status status) {
-        this.requestID = requestID;
         this.productName = productName;
         this.productCompany = productCompany;
         this.location = location;
         this.buildingName = buildingName;
         this.quantity = quantity;
-        this.status = status;
+        this.status = Status.valueOf(status);
     }
 
     public Request() {

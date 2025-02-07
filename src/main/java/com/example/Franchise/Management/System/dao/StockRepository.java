@@ -26,8 +26,14 @@ public class StockRepository {
         return rowsAffected == 1;
     }
 
+    public Stock getStockById(int productId) {
+        String sql = "SELECT * FROM stocks WHERE product_id = ?";
+
+        return jdbcTemplate.queryForObject(sql, new StockRowMapper(), productId);
+    }
+
     public List<Stock> getAllStock() {
-        String sql = "SELECT * FROM stocks";
+        String sql = "SELECT * FROM stocks s JOIN products p ON p.product_id = s.product_id JOIN franchises f ON p.franchise_id = f.franchise_id";
 
         return jdbcTemplate.query(sql, new StockRowMapper());
     }

@@ -2,14 +2,18 @@ package com.example.Franchise.Management.System.dto;
 
 public class Stock {
     private int franchiseId;
+    private String location;
+    private String buildingName;
     private int productId;
     private String productName;
     private String productCompany;
     private int quantity;
 
-    public Stock(int franchiseId, int product_id, String productName, String productCompany, int quantity) {
+    public Stock(int franchiseId, String location, String buildingName, int productId, String productName, String productCompany, int quantity) {
         this.franchiseId = franchiseId;
-        this.productId = product_id;
+        this.location = location;
+        this.buildingName = buildingName;
+        this.productId = productId;
         this.productName = productName;
         this.productCompany = productCompany;
         this.quantity = quantity;
@@ -53,5 +57,21 @@ public class Stock {
 
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getBuildingName() {
+        return buildingName;
+    }
+
+    public void setBuildingName(String buildingName) {
+        this.buildingName = buildingName;
     }
 }
