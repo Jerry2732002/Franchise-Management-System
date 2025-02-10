@@ -23,17 +23,17 @@ public class StockRepository {
 
         int rowsAffected = jdbcTemplate.update(sql, stock.getFranchiseId(),stock.getProductId(),stock.getQuantity());
 
-        return rowsAffected == 1;
+        return rowsAffected > 1;
     }
 
-    public Stock getStockById(int productId) {
-        String sql = "SELECT * FROM stocks WHERE product_id = ?";
+    public Stock getStockById(int productId, int franchiseId) {
+        String sql = "SELECT * FROM stocks s JOIN products p ON p.product_id = s.product_id JOIN franchises f ON s.franchise_id = f.franchise_id WHERE s.product_id = ? AND s.franchise_id = ?";
 
-        return jdbcTemplate.queryForObject(sql, new StockRowMapper(), productId);
+        return jdbcTemplate.queryForObject(sql, new StockRowMapper(), productId, franchiseId);
     }
 
-    public List<Stock> getAllStock() {
-        String sql = "SELECT * FROM stocks s JOIN products p ON p.product_id = s.product_id JOIN franchises f ON p.franchise_id = f.franchise_id";
+    public List<Stock> getAllStock(int franchiseId) {
+        String sql = "SELECT * FROM stocks s JOIN products p ON p.product_id = s.product_id JOIN franchises f ON s.franchise_id = f.franchise_id WHERE s.franchise_id = ?";
 
         return jdbcTemplate.query(sql, new StockRowMapper());
     }

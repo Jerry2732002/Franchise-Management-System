@@ -25,6 +25,13 @@ public class Supply {
         this.dateOfSupply = dateOfSupply;
     }
 
+    public Supply(int productId, int franchiseId, int quantity, Date dateOfSupply) {
+        this.productId = productId;
+        this.franchiseId = franchiseId;
+        this.quantity = quantity;
+        this.dateOfSupply = dateOfSupply;
+    }
+
     public Supply() {
     }
 

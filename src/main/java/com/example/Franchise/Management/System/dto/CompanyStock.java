@@ -17,6 +17,11 @@ public class CompanyStock {
         this.quantity = quantity;
     }
 
+    public CompanyStock(int productId, int quantity) {
+        this.productId = productId;
+        this.quantity = quantity;
+    }
+
     public int getProductId() {
         return productId;
     }

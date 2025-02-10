@@ -4,6 +4,7 @@ import com.example.Franchise.Management.System.dto.Request;
 import com.example.Franchise.Management.System.enums.Status;
 import com.example.Franchise.Management.System.rowmapper.RequestRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -28,13 +29,23 @@ public class RequestRepository {
     }
 
     public List<Request> getAllRequest() {
-        String sql = "SELECT * FROM requests";
+        String sql = "SELECT * FROM requests r JOIN franchises f ON r.franchise_id = f.franchise_id JOIN products p ON r.product_id = p.product_id";
 
         return jdbcTemplate.query(sql, new RequestRowMapper());
     }
 
+    public Request getRequestById(int requestId) {
+        String sql = "SELECT * FROM requests r JOIN franchises f ON r.franchise_id = f.franchise_id JOIN products p ON r.product_id = p.product_id WHERE request_id = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(sql, new RequestRowMapper(), requestId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
     public List<Request> getPendingRequest() {
-        String sql = "SELECT * FROM requests WHERE status = 'PENDING'";
+        String sql = "SELECT * FROM requests r JOIN franchises f ON r.franchise_id = f.franchise_id JOIN products p ON r.product_id = p.product_id WHERE status = 'PENDING'";
 
         return jdbcTemplate.query(sql, new RequestRowMapper());
     }

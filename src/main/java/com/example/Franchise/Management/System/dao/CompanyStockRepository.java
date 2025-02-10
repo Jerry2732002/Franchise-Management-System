@@ -3,6 +3,7 @@ package com.example.Franchise.Management.System.dao;
 import com.example.Franchise.Management.System.dto.CompanyStock;
 import com.example.Franchise.Management.System.rowmapper.CompanyStockRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -23,13 +24,16 @@ public class CompanyStockRepository {
 
         int rowsAffected = jdbcTemplate.update(sql, stock.getProductId(), stock.getQuantity());
 
-        return rowsAffected == 1;
+        return rowsAffected > 1;
     }
 
     public CompanyStock getCompanyStockById(int productId) {
-        String sql = "SELECT * FROM company_stocks cs JOIN products p ON p.product_id = cs.product_id WHERE product_id = ?";
-
-        return jdbcTemplate.queryForObject(sql, new CompanyStockRowMapper(), productId);
+        String sql = "SELECT * FROM company_stocks cs JOIN products p ON p.product_id = cs.product_id WHERE cs.product_id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, new CompanyStockRowMapper(), productId);
+        } catch (EmptyResultDataAccessException e) {
+            return new CompanyStock();
+        }
     }
 
     public List<CompanyStock> getAllCompanyStock() {

@@ -24,7 +24,7 @@ public class UserRepository {
     public boolean addUser(User user) {
         String sql = "INSERT INTO users VALUES (?,?,?,?,?)";
 
-        int rowsAffected = jdbcTemplate.update(sql, user.getUserId(), user.getName(), user.getPassword(), user.getFranchiseId(), user.getRole());
+        int rowsAffected = jdbcTemplate.update(sql, user.getUserId(), user.getName(), user.getPassword(), user.getFranchiseId(), user.getRole().name());
 
         return rowsAffected == 1;
     }
@@ -38,7 +38,7 @@ public class UserRepository {
     }
 
     public User getUserById(String userId) {
-        String sql = "SELECT * FROM users WHERE user_id = ?";
+        String sql = "SELECT * FROM users u JOIN franchises f ON f.franchise_id = u.franchise_id WHERE user_id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, new UserRowMapper(), userId);
         } catch (EmptyResultDataAccessException exception) {

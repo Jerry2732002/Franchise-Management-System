@@ -22,6 +22,12 @@ public class CompanyPurchase {
         this.dateOfPurchase = dateOfPurchase;
     }
 
+    public CompanyPurchase(int productId, int quantity, Date dateOfPurchase) {
+        this.productId = productId;
+        this.quantity = quantity;
+        this.dateOfPurchase = dateOfPurchase;
+    }
+
     public String getProductName() {
         return productName;
     }

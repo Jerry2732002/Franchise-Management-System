@@ -15,9 +15,20 @@ public class SessionRepository {
     public boolean addSession(String userId, String sessionId) {
         String sql = "REPLACE INTO sessions VALUES (?,?)";
 
-        int rowsAffected = jdbcTemplate.update(sql, userId, sessionId);
+        int rowsAffected = jdbcTemplate.update(sql, sessionId, userId);
 
         return rowsAffected > 0;
+    }
+
+    public String getSessionByUserId(String userId) {
+        String sql = "SELECT session_id FROM sessions WHERE user_id = ?";
+        String sessionId;
+        try {
+            sessionId = jdbcTemplate.queryForObject(sql, String.class, userId);
+        } catch (EmptyResultDataAccessException e) {
+            sessionId = null;
+        }
+        return sessionId;
     }
 
 }
