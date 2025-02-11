@@ -1,6 +1,8 @@
 package com.example.Franchise.Management.System.dao;
 
+import com.example.Franchise.Management.System.dto.CompanyReport;
 import com.example.Franchise.Management.System.dto.Supply;
+import com.example.Franchise.Management.System.rowmapper.CompanyReportRowMapper;
 import com.example.Franchise.Management.System.rowmapper.PurchaseRowMapper;
 import com.example.Franchise.Management.System.rowmapper.SupplyRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +36,31 @@ public class SupplyRepository {
         return jdbcTemplate.query(sql, new SupplyRowMapper());
     }
 
-    public List<Supply> getSupply(Date startDate, Date endDate) {
-        String sql = "SELECT * FROM supply s JOIN products p ON s.product_id = p.product_id JOIN franchises f ON f.franchise_id = s.franchise_id WHERE date_of_supply BETWEEN ? AND ?";
+    public List<CompanyReport> getCompanyReport(Date startDate, Date endDate) {
+        String sql = "SELECT \n" +
+                "\tp.product_name, \n" +
+                "    p.product_company, \n" +
+                "    s.quantity, \n" +
+                "    s.date_of_supply as supply_purchase_date, \n" +
+                "    p.distributor_price AS price,\n" +
+                "    (s.quantity * p.distributor_price) AS total_price\n" +
+                "FROM \n" +
+                "    supply s \n" +
+                "JOIN \n" +
+                "    products p \n" +
+                "ON \n" +
+                "    p.product_id = s.product_id\n" +
+                "JOIN \n" +
+                "\tfranchises f\n" +
+                "ON \n" +
+                "\tf.franchise_id = s.franchise_id\n" +
+                "WHERE s.date_of_supply BETWEEN ? AND ?";
+        List<CompanyReport> companyReports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate);
 
-        return jdbcTemplate.query(sql, new SupplyRowMapper());
+        for (CompanyReport companyReport : companyReports) {
+            companyReport.setBuyOrSell("SELL");
+        }
+        return companyReports;
     }
+
 }

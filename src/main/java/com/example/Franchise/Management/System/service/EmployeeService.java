@@ -6,11 +6,13 @@ import com.example.Franchise.Management.System.dao.UserRepository;
 import com.example.Franchise.Management.System.dto.Purchases;
 import com.example.Franchise.Management.System.dto.Stock;
 import com.example.Franchise.Management.System.dto.User;
+import com.example.Franchise.Management.System.exception.OutOfStockException;
 import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.List;
 
 @Service
@@ -48,6 +50,26 @@ public class EmployeeService {
     }
 
     public boolean billPurchase(Purchases purchase) {
+        purchase.setDateOfPurchase(new Date(System.currentTimeMillis()));
+        User employee = userRepository.getUserById(purchase.getUserId());
+
+        if (employee == null) {
+            throw new RuntimeException("No employee: " + purchase.getUserId() + "exist");
+        }
+
+        Stock stock = stockRepository.getStockById(purchase.getProductId(), employee.getFranchiseId());
+
+        if (stock == null) {
+            throw new RuntimeException("Stock does not exist for product");
+        }
+
+        if (stock.getQuantity() < purchase.getQuantity()) {
+            throw new OutOfStockException("Out of stock");
+        }
+
+        stock.setQuantity(stock.getQuantity() - purchase.getQuantity());
+        stockRepository.addOrUpdateStock(stock);
+
         return purchaseRepository.addPurchase(purchase);
     }
 }

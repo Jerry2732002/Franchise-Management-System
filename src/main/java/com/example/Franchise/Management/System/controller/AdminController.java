@@ -49,12 +49,12 @@ public class AdminController {
     }
 
     @PostMapping("register-employee")
-    public ResponseEntity<Map<String, String>> addEmployee(@RequestBody User admin, @CookieValue("token") String token) {
+    public ResponseEntity<Map<String, String>> addEmployee(@RequestBody User employee, @CookieValue("token") String token) {
         tokenHandler.validateToken(token);
 
         Map<String, String> response = new HashMap<>();
 
-        if (adminService.addEmployee(admin)) {
+        if (adminService.addEmployee(employee)) {
             response.put("message", "Employee added successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {

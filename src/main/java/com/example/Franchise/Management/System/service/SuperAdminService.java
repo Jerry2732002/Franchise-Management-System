@@ -6,10 +6,18 @@ import com.example.Franchise.Management.System.enums.Status;
 import com.example.Franchise.Management.System.exception.OutOfStockException;
 import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.exception.UserNotFoundException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.Date;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -116,4 +124,40 @@ public class SuperAdminService {
         }
         return false;
     }
+
+    public byte[] generateCompanyReport(Date startDate, Date endDate) throws IOException {
+        List<CompanyReport> companyReports = supplyRepository.getCompanyReport(startDate, endDate);
+        List<CompanyReport> companyReports2 = companyPurchaseRepository.getCompanyReport(startDate,endDate);
+        companyReports.addAll(companyReports2);
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Supply Report");
+
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"Product Name", "Product Company", "Quantity", "Supply Purchase Date", "Price","Total Price","Buy/Sell"};
+
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+
+        int rowNum = 1;
+        for (CompanyReport report : companyReports) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(report.getProductName());
+            row.createCell(1).setCellValue(report.getProductCompany());
+            row.createCell(2).setCellValue(report.getQuantity());
+            row.createCell(3).setCellValue(report.getSupplyPurchaseDate().toString());
+            row.createCell(4).setCellValue(report.getPrice());
+            row.createCell(5).setCellValue(report.getTotalPrice());
+            row.createCell(6).setCellValue(report.getBuyOrSell());
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        workbook.write(baos);
+        workbook.close();
+
+        return baos.toByteArray();
+    }
+
 }

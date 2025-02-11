@@ -12,8 +12,10 @@ public class Supply {
     private String location;
     private String buildingName;
     private Date dateOfSupply;
+    private double distributorPrice;
+    private double totalPrice;
 
-    public Supply(int supplyId, int productId, String productName, String productCompany, int quantity, int franchiseId, String location, String buildingName, Date dateOfSupply) {
+    public Supply(int supplyId, int productId, String productName, String productCompany, int quantity, int franchiseId, String location, String buildingName, Date dateOfSupply, double distributorPrice, double companyExpense) {
         this.supplyId = supplyId;
         this.productId = productId;
         this.productName = productName;
@@ -23,6 +25,8 @@ public class Supply {
         this.location = location;
         this.buildingName = buildingName;
         this.dateOfSupply = dateOfSupply;
+        this.distributorPrice = distributorPrice;
+        this.totalPrice = companyExpense;
     }
 
     public Supply(int productId, int franchiseId, int quantity, Date dateOfSupply) {
@@ -105,5 +109,21 @@ public class Supply {
 
     public void setFranchiseId(int franchiseId) {
         this.franchiseId = franchiseId;
+    }
+
+    public double getDistributorPrice() {
+        return distributorPrice;
+    }
+
+    public void setDistributorPrice(double distributorPrice) {
+        this.distributorPrice = distributorPrice;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

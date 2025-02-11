@@ -35,7 +35,7 @@ public class StockRepository {
     public List<Stock> getAllStock(int franchiseId) {
         String sql = "SELECT * FROM stocks s JOIN products p ON p.product_id = s.product_id JOIN franchises f ON s.franchise_id = f.franchise_id WHERE s.franchise_id = ?";
 
-        return jdbcTemplate.query(sql, new StockRowMapper());
+        return jdbcTemplate.query(sql, new StockRowMapper(), franchiseId);
     }
 
 }

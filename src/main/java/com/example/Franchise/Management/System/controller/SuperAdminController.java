@@ -8,10 +8,13 @@ import com.example.Franchise.Management.System.service.TokenHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,7 +197,17 @@ public class SuperAdminController {
             response.put("message", "Failed to add company purchase");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @GetMapping("/download-supply-report")
+    public ResponseEntity<byte[]> downloadSupplyReport(@RequestParam("start") Date startDate, @RequestParam("end") Date endDate) throws IOException {
+
+        byte[] excelFile = superAdminService.generateCompanyReport(startDate, endDate);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=supply_report.xlsx");
+
+        return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }
 
 }

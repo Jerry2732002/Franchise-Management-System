@@ -18,7 +18,9 @@ public class SupplyRowMapper implements RowMapper<Supply> {
                 rs.getInt("franchise_id"),
                 rs.getString("location"),
                 rs.getString("building_name"),
-                rs.getDate("date_of_supply")
+                rs.getDate("date_of_supply"),
+                rs.getDouble("distributor_price"),
+                rs.getDouble("total_price")
                 );
     }
 }

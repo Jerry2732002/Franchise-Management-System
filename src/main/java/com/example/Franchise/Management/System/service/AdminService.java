@@ -5,6 +5,7 @@ import com.example.Franchise.Management.System.dao.UserRepository;
 import com.example.Franchise.Management.System.dto.Request;
 import com.example.Franchise.Management.System.dto.User;
 import com.example.Franchise.Management.System.enums.Role;
+import com.example.Franchise.Management.System.enums.Status;
 import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ public class AdminService {
     }
 
     public boolean addRequest(Request request) {
+        request.setStatus(Status.PENDING);
         return requestRepository.addRequest(request);
     }
 }

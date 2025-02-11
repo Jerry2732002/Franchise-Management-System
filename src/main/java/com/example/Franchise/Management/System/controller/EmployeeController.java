@@ -39,7 +39,7 @@ public class EmployeeController {
                 session.invalidate();
             }
             session = request.getSession(true);
-            String token = tokenHandler.generateToken(session.getId(), user.getUserId(), Role.SADMIN);
+            String token = tokenHandler.generateToken(session.getId(), user.getUserId(), Role.EMPLOYEE);
 
             response = new HashMap<>();
             response.put("message", "Login successful");
@@ -52,7 +52,7 @@ public class EmployeeController {
     }
 
     @GetMapping("available-stocks")
-    public ResponseEntity<Map<String, List<Stock>>> getAllAvailableStocks(@CookieValue("token") String token, @RequestParam("franchise_id") int franchiseId) {
+    public ResponseEntity<Map<String, List<Stock>>> getAllAvailableStocks(@CookieValue("token") String token, @RequestParam("id") int franchiseId) {
         tokenHandler.validateToken(token);
 
         Map<String, List<Stock>> response = new HashMap<>();

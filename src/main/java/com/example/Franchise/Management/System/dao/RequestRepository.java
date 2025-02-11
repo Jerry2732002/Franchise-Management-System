@@ -21,9 +21,9 @@ public class RequestRepository {
     }
 
     public boolean addRequest(Request request) {
-        String sql = "INSERT INTO requests (franchise_id, product_id, quantity, status)";
+        String sql = "INSERT INTO requests (franchise_id, product_id, quantity, status) VALUES (?,?,?,?)";
 
-        int rowAffected = jdbcTemplate.update(sql, request.getFranchiseId(),request.getProductId(),request.getQuantity(), request.getStatus());
+        int rowAffected = jdbcTemplate.update(sql, request.getFranchiseId(),request.getProductId(),request.getQuantity(), request.getStatus().name());
 
         return rowAffected == 1;
     }
@@ -53,7 +53,7 @@ public class RequestRepository {
     public boolean updateRequest(int requestId, Status status) {
         String sql = "UPDATE requests SET status = ? WHERE request_id = ?";
 
-        int rowsAffected = jdbcTemplate.update(sql);
+        int rowsAffected = jdbcTemplate.update(sql, status.name(), requestId);
 
         return rowsAffected == 1;
     }
