@@ -40,8 +40,8 @@ public class CompanyPurchaseRepository {
                 "    p.product_company, \n" +
                 "    cp.quantity, \n" +
                 "    cp.date_of_purchase as supply_purchase_date, \n" +
-                "    p.distributor_price AS price,\n" +
-                "    (cp.quantity * p.distributor_price) AS total_price\n" +
+                "    p.wholesale_price AS price,\n" +
+                "    (cp.quantity * p.wholesale_price) AS total_price\n" +
                 "FROM \n" +
                 "    company_purchases cp \n" +
                 "JOIN \n" +

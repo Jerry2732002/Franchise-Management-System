@@ -131,7 +131,7 @@ public class SuperAdminService {
         List<Report> reports2 = companyPurchaseRepository.getCompanyReport(startDate, endDate);
         reports.addAll(reports2);
 
-        reports2.sort(Comparator.comparing(Report::getSupplyPurchaseDate));
+        reports.sort(Comparator.comparing(Report::getSupplyPurchaseDate));
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Supply Report");
