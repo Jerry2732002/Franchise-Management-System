@@ -54,7 +54,7 @@ public class EmployeeService {
         User employee = userRepository.getUserById(purchase.getUserId());
 
         if (employee == null) {
-            throw new RuntimeException("No employee: " + purchase.getUserId() + "exist");
+            throw new RuntimeException("No employee: " + purchase.getUserId() + " exist");
         }
 
         Stock stock = stockRepository.getStockById(purchase.getProductId(), employee.getFranchiseId());
