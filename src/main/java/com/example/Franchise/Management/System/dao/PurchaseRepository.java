@@ -41,8 +41,8 @@ public class PurchaseRepository {
                 "    pr.product_company, \n" +
                 "    p.quantity, \n" +
                 "    p.date_of_purchase as supply_purchase_date, \n" +
-                "    pr.distributor_price as price,\n" +
-                "    (p.quantity * pr.distributor_price) AS total_price\n" +
+                "    pr.retail_price as price,\n" +
+                "    (p.quantity * pr.retail_price) AS total_price\n" +
                 "FROM \n" +
                 "    purchases p \n" +
                 "JOIN \n" +
