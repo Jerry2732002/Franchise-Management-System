@@ -7,10 +7,13 @@ import com.example.Franchise.Management.System.service.AdminService;
 import com.example.Franchise.Management.System.service.TokenHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,5 +94,16 @@ public class AdminController {
             response.put("message", "Failed to add request");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("download-franchise-report")
+    public ResponseEntity<byte[]> downloadSupplyReport(@RequestParam("start") Date startDate, @RequestParam("end") Date endDate, @RequestParam("id") int franchiseId) throws IOException {
+
+        byte[] excelFile = adminService.generateFranchiseReport(startDate, endDate,franchiseId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=franchise_report.xlsx");
+
+        return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }
 }

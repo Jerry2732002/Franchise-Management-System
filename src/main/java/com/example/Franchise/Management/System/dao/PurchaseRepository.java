@@ -1,6 +1,8 @@
 package com.example.Franchise.Management.System.dao;
 
 import com.example.Franchise.Management.System.dto.Purchases;
+import com.example.Franchise.Management.System.dto.Report;
+import com.example.Franchise.Management.System.rowmapper.CompanyReportRowMapper;
 import com.example.Franchise.Management.System.rowmapper.PurchaseRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,9 +35,36 @@ public class PurchaseRepository {
         return jdbcTemplate.query(sql, new PurchaseRowMapper());
     }
 
-    public List<Purchases> getPurchases(Date startDate, Date endDate) {
-        String sql = "SELECT * FROM purchases p JOIN products pr ON p.product_id = pr.product_id JOIN users u ON u.user_id = p.user_id WHERE date_of_purchase BETWEEN ? AND ?";
+    public List<Report> getFranchiseReport(Date startDate, Date endDate, int franchiseId) {
+        String sql = "SELECT \n" +
+                "\tpr.product_name, \n" +
+                "    pr.product_company, \n" +
+                "    p.quantity, \n" +
+                "    p.date_of_purchase as supply_purchase_date, \n" +
+                "    pr.distributor_price as price,\n" +
+                "    (p.quantity * pr.distributor_price) AS total_price\n" +
+                "FROM \n" +
+                "    purchases p \n" +
+                "JOIN \n" +
+                "    products pr \n" +
+                "ON \n" +
+                "    p.product_id = pr.product_id\n" +
+                "JOIN \n" +
+                "\tusers u\n" +
+                "ON\n" +
+                "\tp.user_id = u.user_id\n" +
+                "JOIN \n" +
+                "\tfranchises f\n" +
+                "ON \n" +
+                "\tf.franchise_id = u.franchise_id\n" +
+                "WHERE p.date_of_purchase BETWEEN ? AND ? AND f.franchise_id = ?";
 
-        return jdbcTemplate.query(sql, new PurchaseRowMapper(), startDate, endDate);
+        List<Report> reports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate, franchiseId);
+
+        for (Report report : reports) {
+            report.setBuyOrSell("SELL");
+        }
+        return reports;
     }
+
 }

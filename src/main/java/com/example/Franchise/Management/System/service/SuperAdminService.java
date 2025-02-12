@@ -6,10 +6,7 @@ import com.example.Franchise.Management.System.enums.Status;
 import com.example.Franchise.Management.System.exception.OutOfStockException;
 import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.exception.UserNotFoundException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Date;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -102,10 +99,14 @@ public class SuperAdminService {
             int existingCompanyStockQuantity = companyStockRepository.getCompanyStockById(request.getProductId()).getQuantity();
 
             if (existingCompanyStockQuantity < request.getQuantity()) {
-                throw new OutOfStockException("Available stock: " + existingCompanyStockQuantity);
+                throw new OutOfStockException("Out Of Stock. Available stock: " + existingCompanyStockQuantity);
             }
 
-            int existingStockQuantity = stockRepository.getStockById(request.getProductId(), request.getFranchiseId()).getQuantity();
+            Stock existingStock = stockRepository.getStockById(request.getProductId(), request.getFranchiseId());
+            int existingStockQuantity = 0;
+            if (existingStock != null) {
+                existingStockQuantity = existingStock.getQuantity();
+            }
             //updates stock to add the request amount of product
             stockRepository.addOrUpdateStock(new Stock(request.getFranchiseId(), request.getProductId(), request.getQuantity() + existingStockQuantity));
             //add a new record to supply to reflect the transfer
@@ -126,23 +127,40 @@ public class SuperAdminService {
     }
 
     public byte[] generateCompanyReport(Date startDate, Date endDate) throws IOException {
-        List<CompanyReport> companyReports = supplyRepository.getCompanyReport(startDate, endDate);
-        List<CompanyReport> companyReports2 = companyPurchaseRepository.getCompanyReport(startDate,endDate);
-        companyReports.addAll(companyReports2);
+        List<Report> reports = supplyRepository.getCompanyReport(startDate, endDate);
+        List<Report> reports2 = companyPurchaseRepository.getCompanyReport(startDate, endDate);
+        reports.addAll(reports2);
+
+        reports2.sort(Comparator.comparing(Report::getSupplyPurchaseDate));
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Supply Report");
 
+        CellStyle buyStyle = workbook.createCellStyle();
+        buyStyle.setFillForegroundColor(IndexedColors.RED.getIndex());
+        buyStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+        CellStyle sellStyle = workbook.createCellStyle();
+        sellStyle.setFillForegroundColor(IndexedColors.LIGHT_GREEN.getIndex());
+        sellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"Product Name", "Product Company", "Quantity", "Supply Purchase Date", "Price","Total Price","Buy/Sell"};
+        String[] headers = {"Product Name", "Product Company", "Quantity", "Supply Purchase Date", "Price", "Total Price", "Buy/Sell"};
 
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
         }
 
+        double totalCompanyProfit = reports.stream().map(report -> {
+            if (report.getBuyOrSell().equals("BUY")) {
+                return -report.getTotalPrice();
+            }
+            return report.getTotalPrice();
+        }).reduce(Double::sum).get();
+
         int rowNum = 1;
-        for (CompanyReport report : companyReports) {
+        for (Report report : reports) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(report.getProductName());
             row.createCell(1).setCellValue(report.getProductCompany());
@@ -150,14 +168,25 @@ public class SuperAdminService {
             row.createCell(3).setCellValue(report.getSupplyPurchaseDate().toString());
             row.createCell(4).setCellValue(report.getPrice());
             row.createCell(5).setCellValue(report.getTotalPrice());
-            row.createCell(6).setCellValue(report.getBuyOrSell());
-        }
+            Cell cell = row.createCell(6);
+            cell.setCellValue(report.getBuyOrSell());
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        workbook.write(baos);
+            if (report.getBuyOrSell().equals("BUY")) {
+                cell.setCellStyle(buyStyle);
+            } else {
+                cell.setCellStyle(sellStyle);
+            }
+
+        }
+        Row row = sheet.createRow(rowNum);
+        row.createCell(4).setCellValue("Total Company Profit");
+        row.createCell(5).setCellValue(totalCompanyProfit);
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        workbook.write(outStream);
         workbook.close();
 
-        return baos.toByteArray();
+        return outStream.toByteArray();
     }
 
 }

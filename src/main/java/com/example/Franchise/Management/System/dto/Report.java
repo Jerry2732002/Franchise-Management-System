@@ -2,7 +2,7 @@ package com.example.Franchise.Management.System.dto;
 
 import java.sql.Date;
 
-public class CompanyReport {
+public class Report {
     private String productName;
     private String productCompany;
     private int quantity;
@@ -11,7 +11,7 @@ public class CompanyReport {
     private double totalPrice;
     private String buyOrSell;
 
-    public CompanyReport(String productName, String productCompany, int quantity, Date supplyPurchaseDate, double wholesalePrice, double totalAmount, String buyOrSell) {
+    public Report(String productName, String productCompany, int quantity, Date supplyPurchaseDate, double wholesalePrice, double totalAmount, String buyOrSell) {
         this.productName = productName;
         this.productCompany = productCompany;
         this.quantity = quantity;

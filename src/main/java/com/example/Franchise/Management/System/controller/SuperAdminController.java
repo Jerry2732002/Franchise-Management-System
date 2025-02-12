@@ -199,13 +199,13 @@ public class SuperAdminController {
         }
     }
 
-    @GetMapping("/download-supply-report")
+    @GetMapping("download-supply-report")
     public ResponseEntity<byte[]> downloadSupplyReport(@RequestParam("start") Date startDate, @RequestParam("end") Date endDate) throws IOException {
 
         byte[] excelFile = superAdminService.generateCompanyReport(startDate, endDate);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=supply_report.xlsx");
+        headers.add("Content-Disposition", "attachment; filename=company_report.xlsx");
 
         return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
     }

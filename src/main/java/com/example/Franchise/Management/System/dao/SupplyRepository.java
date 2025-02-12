@@ -1,9 +1,8 @@
 package com.example.Franchise.Management.System.dao;
 
-import com.example.Franchise.Management.System.dto.CompanyReport;
+import com.example.Franchise.Management.System.dto.Report;
 import com.example.Franchise.Management.System.dto.Supply;
 import com.example.Franchise.Management.System.rowmapper.CompanyReportRowMapper;
-import com.example.Franchise.Management.System.rowmapper.PurchaseRowMapper;
 import com.example.Franchise.Management.System.rowmapper.SupplyRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,7 +35,7 @@ public class SupplyRepository {
         return jdbcTemplate.query(sql, new SupplyRowMapper());
     }
 
-    public List<CompanyReport> getCompanyReport(Date startDate, Date endDate) {
+    public List<Report> getCompanyReport(Date startDate, Date endDate) {
         String sql = "SELECT \n" +
                 "\tp.product_name, \n" +
                 "    p.product_company, \n" +
@@ -55,12 +54,39 @@ public class SupplyRepository {
                 "ON \n" +
                 "\tf.franchise_id = s.franchise_id\n" +
                 "WHERE s.date_of_supply BETWEEN ? AND ?";
-        List<CompanyReport> companyReports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate);
+        List<Report> reports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate);
 
-        for (CompanyReport companyReport : companyReports) {
-            companyReport.setBuyOrSell("SELL");
+        for (Report report : reports) {
+            report.setBuyOrSell("SELL");
         }
-        return companyReports;
+        return reports;
+    }
+
+    public List<Report> getFranchiseReport(Date startDate, Date endDate, int franchiseId) {
+        String sql = "SELECT \n" +
+                "\tp.product_name, \n" +
+                "    p.product_company, \n" +
+                "    s.quantity, \n" +
+                "    s.date_of_supply as supply_purchase_date, \n" +
+                "    p.distributor_price as price,\n" +
+                "    (s.quantity * p.distributor_price) AS total_price\n" +
+                "FROM \n" +
+                "    supply s \n" +
+                "JOIN \n" +
+                "    products p \n" +
+                "ON \n" +
+                "    p.product_id = s.product_id\n" +
+                "JOIN \n" +
+                "\tfranchises f\n" +
+                "ON \n" +
+                "\tf.franchise_id = s.franchise_id\n" +
+                "WHERE s.date_of_supply BETWEEN ? AND ? AND f.franchise_id = ?";
+        List<Report> reports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate,franchiseId);
+
+        for (Report report : reports) {
+            report.setBuyOrSell("BUY");
+        }
+        return reports;
     }
 
 }

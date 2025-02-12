@@ -1,7 +1,7 @@
 package com.example.Franchise.Management.System.dao;
 
 import com.example.Franchise.Management.System.dto.CompanyPurchase;
-import com.example.Franchise.Management.System.dto.CompanyReport;
+import com.example.Franchise.Management.System.dto.Report;
 import com.example.Franchise.Management.System.rowmapper.CompanyPurchaseRowMapper;
 import com.example.Franchise.Management.System.rowmapper.CompanyReportRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class CompanyPurchaseRepository {
         return jdbcTemplate.query(sql, new CompanyPurchaseRowMapper());
     }
 
-    public List<CompanyReport> getCompanyReport(Date startDate, Date endDate) {
+    public List<Report> getCompanyReport(Date startDate, Date endDate) {
         String sql = "SELECT \n" +
                 "\tp.product_name, \n" +
                 "    p.product_company, \n" +
@@ -49,11 +49,11 @@ public class CompanyPurchaseRepository {
                 "ON \n" +
                 "    p.product_id = cp.product_id\n" +
                 "WHERE cp.date_of_purchase BETWEEN ? AND ?";
-        List<CompanyReport> companyReports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate);
+        List<Report> reports = jdbcTemplate.query(sql, new CompanyReportRowMapper(),startDate,endDate);
 
-        for (CompanyReport companyReport : companyReports) {
-            companyReport.setBuyOrSell("BUY");
+        for (Report report : reports) {
+            report.setBuyOrSell("BUY");
         }
-        return companyReports;
+        return reports;
     }
 }

@@ -32,7 +32,7 @@ public class EmployeeService {
     }
 
     public boolean authenticateEmployee(User employee) {
-        User existingUser = userRepository.getSuperAdminById(employee.getUserId());
+        User existingUser = userRepository.getUserById(employee.getUserId());
 
         if (existingUser == null) {
             throw new UserNotFoundException("User: " + employee.getUserId() + " does not exist");

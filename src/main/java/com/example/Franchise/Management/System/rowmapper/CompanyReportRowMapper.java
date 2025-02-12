@@ -1,15 +1,15 @@
 package com.example.Franchise.Management.System.rowmapper;
 
-import com.example.Franchise.Management.System.dto.CompanyReport;
+import com.example.Franchise.Management.System.dto.Report;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CompanyReportRowMapper implements RowMapper<CompanyReport> {
+public class CompanyReportRowMapper implements RowMapper<Report> {
     @Override
-    public CompanyReport mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new CompanyReport(
+    public Report mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new Report(
                 rs.getString("product_name"),
                 rs.getString("product_company"),
                 rs.getInt("quantity"),

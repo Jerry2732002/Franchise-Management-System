@@ -24,7 +24,7 @@ public class CompanyStockRepository {
 
         int rowsAffected = jdbcTemplate.update(sql, stock.getProductId(), stock.getQuantity());
 
-        return rowsAffected > 1;
+        return rowsAffected >= 1;
     }
 
     public CompanyStock getCompanyStockById(int productId) {
