@@ -3,6 +3,7 @@ package com.example.Franchise.Management.System.controller;
 import com.example.Franchise.Management.System.dto.Request;
 import com.example.Franchise.Management.System.dto.User;
 import com.example.Franchise.Management.System.enums.Role;
+import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.service.AdminService;
 import com.example.Franchise.Management.System.service.TokenHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +30,13 @@ public class AdminController {
         this.tokenHandler = tokenHandler;
     }
 
+    private void validateUser(String token) {
+        tokenHandler.validateToken(token);
+        if (!tokenHandler.extractRole(token).equals("ADMIN")) {
+            throw new UnauthorizedException("User is not a valid Admin");
+        }
+    }
+
     @PostMapping("login")
     public ResponseEntity<Map<String, String>> adminLogin(@RequestBody User user, HttpServletRequest request) {
         Map<String, String> response;
@@ -53,11 +61,11 @@ public class AdminController {
 
     @PostMapping("register-employee")
     public ResponseEntity<Map<String, String>> addEmployee(@RequestBody User employee, @CookieValue("token") String token) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
-        if (adminService.addEmployee(employee)) {
+        if (adminService.addEmployee(employee, token)) {
             response.put("message", "Employee added successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
@@ -68,7 +76,7 @@ public class AdminController {
 
     @DeleteMapping("remove-employee")
     public ResponseEntity<Map<String, String>> removeEmployee(@CookieValue("token") String token, @RequestParam("employeeId") String employeeId) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -82,12 +90,12 @@ public class AdminController {
     }
 
     @PostMapping("request-stock")
-    public ResponseEntity<Map<String,String>> addRequest(@CookieValue("token") String token, @RequestBody Request request) {
-        tokenHandler.validateToken(token);
+    public ResponseEntity<Map<String, String>> addRequest(@CookieValue("token") String token, @RequestBody Request request) {
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
-        if (adminService.addRequest(request)) {
+        if (adminService.addRequest(request, token)) {
             response.put("message", "Request added successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
@@ -97,9 +105,9 @@ public class AdminController {
     }
 
     @GetMapping("download-franchise-report")
-    public ResponseEntity<byte[]> downloadSupplyReport(@RequestParam("start") Date startDate, @RequestParam("end") Date endDate, @RequestParam("id") int franchiseId) throws IOException {
-
-        byte[] excelFile = adminService.generateFranchiseReport(startDate, endDate,franchiseId);
+    public ResponseEntity<byte[]> downloadSupplyReport(@CookieValue("token") String token, @RequestParam("start") Date startDate, @RequestParam("end") Date endDate, @RequestParam("id") int franchiseId) throws IOException {
+        validateUser(token);
+        byte[] excelFile = adminService.generateFranchiseReport(startDate, endDate, franchiseId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=franchise_report.xlsx");

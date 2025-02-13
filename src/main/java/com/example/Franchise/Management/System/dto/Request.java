@@ -25,6 +25,13 @@ public class Request {
         this.status = Status.valueOf(status);
     }
 
+    public Request(int franchiseId, int productId,int quantity, Status status) {
+        this.franchiseId = franchiseId;
+        this.productId = productId;
+        this.quantity = quantity;
+        this.status = status;
+    }
+
     public Request() {
     }
 

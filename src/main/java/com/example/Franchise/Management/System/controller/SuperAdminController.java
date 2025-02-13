@@ -3,6 +3,7 @@ package com.example.Franchise.Management.System.controller;
 import com.example.Franchise.Management.System.dto.*;
 import com.example.Franchise.Management.System.enums.Role;
 import com.example.Franchise.Management.System.enums.Status;
+import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.service.SuperAdminService;
 import com.example.Franchise.Management.System.service.TokenHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +32,13 @@ public class SuperAdminController {
         this.tokenHandler = tokenHandler;
     }
 
+    private void validateUser(String token) {
+        tokenHandler.validateToken(token);
+        if(!tokenHandler.extractRole(token).equals("SADMIN")) {
+            throw new UnauthorizedException("User is not a valid Super Admin");
+        }
+    }
+
     @PostMapping("login")
     public ResponseEntity<Map<String, String>> superAdminLogin(@RequestBody User user, HttpServletRequest request) {
         Map<String, String> response;
@@ -55,7 +63,7 @@ public class SuperAdminController {
 
     @PostMapping("register-user")
     public ResponseEntity<Map<String, String>> addAdmin(@RequestBody User admin, @CookieValue("token") String token) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -70,7 +78,7 @@ public class SuperAdminController {
 
     @PostMapping("add-franchise")
     public ResponseEntity<Map<String, String>> addFranchise(@RequestBody Franchise franchise, @CookieValue("token") String token) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -85,7 +93,7 @@ public class SuperAdminController {
 
     @GetMapping("list-franchise")
     public ResponseEntity<Map<String, List<Franchise>>> getAllFranchise(@CookieValue("token") String token) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, List<Franchise>> response = new HashMap<>();
         response.put("franchises", superAdminService.getAllFranchise());
@@ -94,7 +102,7 @@ public class SuperAdminController {
 
     @DeleteMapping("remove-franchise")
     public ResponseEntity<Map<String, String>> deleteFranchise(@CookieValue("token") String token, @RequestParam("id") int franchiseId) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -109,7 +117,7 @@ public class SuperAdminController {
 
     @PostMapping("add-product")
     public ResponseEntity<Map<String, String>> addProduct(@CookieValue("token") String token, @RequestBody Product product) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -124,7 +132,7 @@ public class SuperAdminController {
 
     @GetMapping("list-product")
     public ResponseEntity<Map<String, List<Product>>> getAllProduct(@CookieValue("token") String token) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, List<Product>> response = new HashMap<>();
         response.put("products", superAdminService.getAllProduct());
@@ -133,7 +141,7 @@ public class SuperAdminController {
 
     @PostMapping("add-stock")
     public ResponseEntity<Map<String, String>> addStock(@CookieValue("token") String token, @RequestBody Stock stock) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -146,18 +154,27 @@ public class SuperAdminController {
         }
     }
 
+    @GetMapping("list-company-stock")
+    public ResponseEntity<Map<String, List<CompanyStock>>> listStock(@CookieValue("token") String token) {
+        validateUser(token);
+
+        Map<String, List<CompanyStock>> response = new HashMap<>();
+        response.put("company-stock",superAdminService.getAllCompanyStock());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("view-request")
-    public ResponseEntity<Map<String, List<Request>>> getAllRequest(@CookieValue("token") String token) {
-        tokenHandler.validateToken(token);
+    public ResponseEntity<Map<String, List<Request>>> getAllRequest(@CookieValue("token") String token, @RequestParam("status") String status) {
+        validateUser(token);
 
         Map<String, List<Request>> response = new HashMap<>();
-        response.put("requests", superAdminService.getAllRequest());
+        response.put("requests", superAdminService.getAllRequest(status.toUpperCase()));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("reject-request")
     public ResponseEntity<Map<String, String>> rejectRequest(@CookieValue("token") String token, @RequestParam("id") int requestId) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -172,7 +189,7 @@ public class SuperAdminController {
 
     @PutMapping("accept-request")
     public ResponseEntity<Map<String, String>> acceptRequest(@CookieValue("token") String token, @RequestParam("id") int requestId) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
@@ -187,7 +204,7 @@ public class SuperAdminController {
 
     @PostMapping("company-purchase")
     public ResponseEntity<Map<String, String>> companyPurchase(@CookieValue("token") String token, @RequestParam("id") int productId, @RequestParam("quantity") int quantity) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
         if (superAdminService.addCompanyPurchase(productId, quantity)) {
@@ -200,9 +217,22 @@ public class SuperAdminController {
     }
 
     @GetMapping("download-company-report")
-    public ResponseEntity<byte[]> downloadSupplyReport(@RequestParam("start") Date startDate, @RequestParam("end") Date endDate) throws IOException {
+    public ResponseEntity<byte[]> downloadSupplyReport(@CookieValue("token") String token, @RequestParam("start") Date startDate, @RequestParam("end") Date endDate) throws IOException {
+        validateUser(token);
 
         byte[] excelFile = superAdminService.generateCompanyReport(startDate, endDate);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=company_report.xlsx");
+
+        return new ResponseEntity<>(excelFile, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("download-franchise-report")
+    public ResponseEntity<byte[]> downloadFranchiseReport(@CookieValue("token") String token, @RequestParam("start") Date startDate, @RequestParam("end") Date endDate) throws IOException {
+        validateUser(token);
+
+        byte[] excelFile = superAdminService.generateFranchiseReport(startDate, endDate);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=company_report.xlsx");

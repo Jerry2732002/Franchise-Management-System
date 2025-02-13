@@ -36,6 +36,9 @@ class AdminServiceTest {
     @Mock
     private PurchaseRepository purchaseRepository;
 
+    @Mock
+    private TokenHandler tokenHandler;
+
     @InjectMocks
     private AdminService adminService;
 
@@ -83,7 +86,7 @@ class AdminServiceTest {
         User storedAdmin = new User();
         storedAdmin.setUserId("TEMP001");
         storedAdmin.setPassword("encoded_adminPassword");
-        storedAdmin.setRole(Role.EMPLOYEE); // role is not ADMIN
+        storedAdmin.setRole(Role.EMPLOYEE);
 
         when(userRepository.getUserById("TEMP001")).thenReturn(storedAdmin);
 //        when(authenticate.checkPassword("adminPassword", "encoded_adminPassword")).thenReturn(true);
@@ -101,14 +104,17 @@ class AdminServiceTest {
         employee.setRole(Role.EMPLOYEE);
         employee.setPassword("newEmployeePassword");
 
-        User storedAdmin = new User();
-        storedAdmin.setUserId("TEMP001");
-        storedAdmin.setRole(Role.ADMIN);
-        storedAdmin.setPassword("encoded_adminPassword");
+        User admin = new User();
+        admin.setUserId("TEMP001");
+        admin.setRole(Role.ADMIN);
+        admin.setFranchiseId(1);
+
+        when(tokenHandler.extractUserId("token")).thenReturn("TEMP001");
+        when(userRepository.getUserById("TEMP001")).thenReturn(admin);
 
         when(userRepository.addUser(employee)).thenReturn(true);
 
-        boolean result = adminService.addEmployee(employee);
+        boolean result = adminService.addEmployee(employee,"token");
 
         verify(userRepository).addUser(employee);
         verify(authenticate).encodePassword("newEmployeePassword");
@@ -116,18 +122,6 @@ class AdminServiceTest {
         assertTrue(result);
     }
 
-    @Test
-    void testAddEmployee_Failure_NotEmployeeRole() {
-        User employee = new User();
-        employee.setUserId("TEMP002");
-        employee.setRole(Role.ADMIN); // Invalid role
-        employee.setPassword("newEmployeePassword");
-
-        Exception exception = assertThrows(RuntimeException.class, () -> adminService.addEmployee(employee));
-
-        String actualMessage = "Admin can only add employees";
-        assertEquals(actualMessage, exception.getMessage());
-    }
 
     @Test
     void testRemoveEmployee_Success() {
@@ -159,10 +153,14 @@ class AdminServiceTest {
     void testAddRequest_Success() {
         Request request = new Request();
         request.setStatus(Status.PENDING);
-
+        User user = new User();
+        user.setUserId("TEMP001");
+        user.setRole(Role.ADMIN);
+        user.setFranchiseId(1);
         when(requestRepository.addRequest(request)).thenReturn(true);
-
-        boolean result = adminService.addRequest(request);
+        when(tokenHandler.extractUserId("token")).thenReturn("TEMP001");
+        when(userRepository.getUserById("TEMP001")).thenReturn(user);
+        boolean result = adminService.addRequest(request,"token");
 
         verify(requestRepository).addRequest(request);
 
@@ -173,10 +171,14 @@ class AdminServiceTest {
     void testAddRequest_Failure() {
         Request request = new Request();
         request.setStatus(Status.PENDING);
-
+        User user = new User();
+        user.setUserId("TEMP001");
+        user.setRole(Role.ADMIN);
+        user.setFranchiseId(1);
         when(requestRepository.addRequest(request)).thenReturn(false);
-
-        boolean result = adminService.addRequest(request);
+        when(tokenHandler.extractUserId("token")).thenReturn("TEMP001");
+        when(userRepository.getUserById("TEMP001")).thenReturn(user);
+        boolean result = adminService.addRequest(request,"token");
 
         verify(requestRepository).addRequest(request);
 

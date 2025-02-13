@@ -4,6 +4,7 @@ import com.example.Franchise.Management.System.dto.Purchases;
 import com.example.Franchise.Management.System.dto.Stock;
 import com.example.Franchise.Management.System.dto.User;
 import com.example.Franchise.Management.System.enums.Role;
+import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.service.EmployeeService;
 import com.example.Franchise.Management.System.service.TokenHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,13 @@ public class EmployeeController {
         this.tokenHandler = tokenHandler;
     }
 
+    private void validateUser(String token) {
+        tokenHandler.validateToken(token);
+        if (!tokenHandler.extractRole(token).equals("EMPLOYEE")) {
+            throw new UnauthorizedException("User is not a valid Employee");
+        }
+    }
+
     @PostMapping("login")
     public ResponseEntity<Map<String, String>> employeeLogin(@RequestBody User user, HttpServletRequest request) {
         Map<String, String> response;
@@ -53,7 +61,7 @@ public class EmployeeController {
 
     @GetMapping("available-stocks")
     public ResponseEntity<Map<String, List<Stock>>> getAllAvailableStocks(@CookieValue("token") String token, @RequestParam("id") int franchiseId) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
 
         Map<String, List<Stock>> response = new HashMap<>();
         response.put("available-stocks", employeeService.getStocksAvailable(franchiseId));
@@ -62,7 +70,9 @@ public class EmployeeController {
 
     @PostMapping("bill")
     public ResponseEntity<Map<String,String>> billPurchase(@CookieValue("token") String token, @RequestBody Purchases purchases) {
-        tokenHandler.validateToken(token);
+        validateUser(token);
+
+        purchases.setUserId(tokenHandler.extractUserId(token));
 
         Map<String, String> response = new HashMap<>();
 

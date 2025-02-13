@@ -50,10 +50,18 @@ public class RequestRepository {
         return jdbcTemplate.query(sql, new RequestRowMapper());
     }
 
-    public boolean updateRequest(int requestId, Status status) {
+    public boolean updateRequestStatus(int requestId, Status status) {
         String sql = "UPDATE requests SET status = ? WHERE request_id = ?";
 
         int rowsAffected = jdbcTemplate.update(sql, status.name(), requestId);
+
+        return rowsAffected == 1;
+    }
+
+    public boolean updateRequestQuantity(int requestId, int newQuantity) {
+        String sql = "UPDATE requests SET quantity = ? WHERE request_id = ?";
+
+        int rowsAffected = jdbcTemplate.update(sql, newQuantity, requestId);
 
         return rowsAffected == 1;
     }

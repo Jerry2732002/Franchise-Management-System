@@ -2,6 +2,7 @@ package com.example.Franchise.Management.System.service;
 
 import com.example.Franchise.Management.System.dao.*;
 import com.example.Franchise.Management.System.dto.*;
+import com.example.Franchise.Management.System.enums.Role;
 import com.example.Franchise.Management.System.enums.Status;
 import com.example.Franchise.Management.System.exception.OutOfStockException;
 import com.example.Franchise.Management.System.exception.UnauthorizedException;
@@ -17,6 +18,8 @@ import java.sql.Date;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class SuperAdminService {
     private final UserRepository userRepository;
@@ -28,10 +31,11 @@ public class SuperAdminService {
     private final SupplyRepository supplyRepository;
     private final CompanyPurchaseRepository companyPurchaseRepository;
     private final CompanyStockRepository companyStockRepository;
+    private final PurchaseRepository purchaseRepository;
 
 
     @Autowired
-    public SuperAdminService(UserRepository userRepository, Authenticate authenticate, FranchiseRepository franchiseRepository, ProductsRepository productsRepository, StockRepository stockRepository, RequestRepository requestRepository, SupplyRepository supplyRepository, CompanyPurchaseRepository companyPurchaseRepository, CompanyStockRepository companyStockRepository) {
+    public SuperAdminService(UserRepository userRepository, Authenticate authenticate, FranchiseRepository franchiseRepository, ProductsRepository productsRepository, StockRepository stockRepository, RequestRepository requestRepository, SupplyRepository supplyRepository, CompanyPurchaseRepository companyPurchaseRepository, CompanyStockRepository companyStockRepository, PurchaseRepository purchaseRepository) {
         this.userRepository = userRepository;
         this.authenticate = authenticate;
         this.franchiseRepository = franchiseRepository;
@@ -41,6 +45,7 @@ public class SuperAdminService {
         this.supplyRepository = supplyRepository;
         this.companyPurchaseRepository = companyPurchaseRepository;
         this.companyStockRepository = companyStockRepository;
+        this.purchaseRepository = purchaseRepository;
     }
 
     public boolean authenticateSuperAdmin(User user) {
@@ -58,6 +63,9 @@ public class SuperAdminService {
     }
 
     public boolean addAdmin(User admin) {
+        if (admin.getRole().equals(Role.SADMIN)) {
+            throw new UnauthorizedException("Cannot add Super Admin");
+        }
         admin.setPassword(authenticate.encodePassword(admin.getPassword()));
         return userRepository.addUser(admin);
     }
@@ -83,47 +91,83 @@ public class SuperAdminService {
     }
 
     public boolean addStock(Stock stock) {
-        int existingQuantity = stockRepository.getStockById(stock.getProductId(), stock.getFranchiseId()).getQuantity();
-        stock.setQuantity(existingQuantity + stock.getQuantity());
+        Stock existingStock = stockRepository.getStockById(stock.getProductId(), stock.getFranchiseId());
+        if (existingStock != null) {
+            stock.setQuantity(existingStock.getQuantity() + stock.getQuantity());
+        }
         return stockRepository.addOrUpdateStock(stock);
     }
 
-    public List<Request> getAllRequest() {
-        return requestRepository.getAllRequest();
+    public List<Request> getAllRequest(String status) {
+        return requestRepository.getAllRequest().stream().filter(request -> {
+                    if (status.equals("PENDING")) {
+                        return request.getStatus().equals(Status.PENDING) || request.getStatus().equals(Status.PARTIALLY_ACCEPTED);
+                    }
+                    return request.getStatus().name().equals(status.toUpperCase());
+                }
+        ).toList();
     }
 
     public boolean updateRequest(int requestId, Status status) {
-        if (status.equals(Status.ACCEPTED)) {
-            Request request = requestRepository.getRequestById(requestId);
-
-            int existingCompanyStockQuantity = companyStockRepository.getCompanyStockById(request.getProductId()).getQuantity();
-
-            if (existingCompanyStockQuantity < request.getQuantity()) {
-                throw new OutOfStockException("Out Of Stock. Available stock: " + existingCompanyStockQuantity);
-            }
-
-            Stock existingStock = stockRepository.getStockById(request.getProductId(), request.getFranchiseId());
-            int existingStockQuantity = 0;
-            if (existingStock != null) {
-                existingStockQuantity = existingStock.getQuantity();
-            }
-            //updates stock to add the request amount of product
-            stockRepository.addOrUpdateStock(new Stock(request.getFranchiseId(), request.getProductId(), request.getQuantity() + existingStockQuantity));
-            //add a new record to supply to reflect the transfer
-            supplyRepository.addSupply(new Supply(request.getProductId(), request.getFranchiseId(), request.getQuantity(), new Date(System.currentTimeMillis())));
-            //removes the requested amount of product from company stock
-            companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(request.getProductId(), existingCompanyStockQuantity - request.getQuantity()));
+        if (status.equals(Status.REJECTED)) {
+            return requestRepository.updateRequestStatus(requestId, status);
         }
 
-        return requestRepository.updateRequest(requestId, status);
+        Request request = requestRepository.getRequestById(requestId);
+        CompanyStock existingCompanyStock = companyStockRepository.getCompanyStockById(request.getProductId());
+        int companyStockQuantity = existingCompanyStock.getQuantity();
+
+        if (companyStockQuantity <= 0) {
+            throw new OutOfStockException("Out Of Stock. Available stock: " + companyStockQuantity);
+        }
+
+        Date currentDate = new Date(System.currentTimeMillis());
+
+        if (companyStockQuantity < request.getQuantity()) {
+            status = Status.PARTIALLY_ACCEPTED;
+            handlePartialStockUpdate(request, existingCompanyStock, currentDate);
+        } else {
+            handleFullStockUpdate(request, existingCompanyStock, currentDate);
+        }
+
+        return requestRepository.updateRequestStatus(requestId, status);
     }
+
+    private void handlePartialStockUpdate(Request request, CompanyStock existingCompanyStock, Date currentDate) {
+        Stock existingStock = stockRepository.getStockById(request.getProductId(), request.getFranchiseId());
+        int existingStockQuantity = (existingStock != null) ? existingStock.getQuantity() : 0;
+
+        stockRepository.addOrUpdateStock(new Stock(request.getFranchiseId(), request.getProductId(), existingCompanyStock.getQuantity() + existingStockQuantity));
+
+        supplyRepository.addSupply(new Supply(request.getProductId(), request.getFranchiseId(), existingCompanyStock.getQuantity(), currentDate));
+
+        companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(request.getProductId(), 0));
+
+        requestRepository.updateRequestQuantity(request.getRequestID(), request.getQuantity() - existingCompanyStock.getQuantity());
+    }
+
+    private void handleFullStockUpdate(Request request, CompanyStock existingCompanyStock, Date currentDate) {
+        Stock existingStock = stockRepository.getStockById(request.getProductId(), request.getFranchiseId());
+        int existingStockQuantity = (existingStock != null) ? existingStock.getQuantity() : 0;
+
+        stockRepository.addOrUpdateStock(new Stock(request.getFranchiseId(), request.getProductId(), request.getQuantity() + existingStockQuantity));
+
+        supplyRepository.addSupply(new Supply(request.getProductId(), request.getFranchiseId(), request.getQuantity(), currentDate));
+
+        companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(request.getProductId(), existingCompanyStock.getQuantity() - request.getQuantity()));
+    }
+
 
     public boolean addCompanyPurchase(int productId, int quantity) {
         if (companyPurchaseRepository.addPurchase(new CompanyPurchase(productId, quantity, new Date(System.currentTimeMillis())))) {
-            int existingCompanyStockQuantity = companyStockRepository.getCompanyStockById(productId).getQuantity();
-            return companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(productId, existingCompanyStockQuantity + quantity));
+            CompanyStock existingCompanyStock = companyStockRepository.getCompanyStockById(productId);
+            return companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(productId, existingCompanyStock.getQuantity() + quantity));
         }
         return false;
+    }
+
+    public List<CompanyStock> getAllCompanyStock() {
+        return companyStockRepository.getAllCompanyStock();
     }
 
     public byte[] generateCompanyReport(Date startDate, Date endDate) throws IOException {
@@ -189,4 +233,49 @@ public class SuperAdminService {
         return outStream.toByteArray();
     }
 
+    public byte[] generateFranchiseReport(Date startDate, Date endDate) throws IOException {
+        List<Integer> franchiseIds = franchiseRepository.getAllFranchiseId();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Franchise Report");
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"Franchise Id", "Location", "Building Name", "Total Income"};
+
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+
+        int rowNum = 1;
+
+        for (int franchiseId : franchiseIds) {
+            List<Report> reports = supplyRepository.getFranchiseReport(startDate, endDate, franchiseId);
+            List<Report> reports2 = purchaseRepository.getFranchiseReport(startDate, endDate, franchiseId);
+            reports.addAll(reports2);
+            Franchise franchise = franchiseRepository.getFranchiseById(franchiseId);
+            double totalCompanyProfit = 0;
+            if (!reports.isEmpty()) {
+                totalCompanyProfit = reports.stream().map(report -> {
+                    if (report.getBuyOrSell().equals("BUY")) {
+                        return -report.getTotalPrice();
+                    }
+                    return report.getTotalPrice();
+                }).reduce(Double::sum).get();
+            }
+
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(franchiseId);
+            row.createCell(1).setCellValue(franchise.getLocation());
+            row.createCell(2).setCellValue(franchise.getBuildingName());
+            row.createCell(3).setCellValue(totalCompanyProfit);
+
+        }
+
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        workbook.write(outStream);
+        workbook.close();
+
+        return outStream.toByteArray();
+    }
 }
+

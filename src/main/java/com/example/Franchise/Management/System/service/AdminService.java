@@ -29,14 +29,16 @@ public class AdminService {
     private final RequestRepository requestRepository;
     private final SupplyRepository supplyRepository;
     private final PurchaseRepository purchaseRepository;
+    private final TokenHandler tokenHandler;
 
     @Autowired
-    public AdminService(UserRepository userRepository, Authenticate authenticate, RequestRepository requestRepository, SupplyRepository supplyRepository, PurchaseRepository purchaseRepository) {
+    public AdminService(UserRepository userRepository, Authenticate authenticate, RequestRepository requestRepository, SupplyRepository supplyRepository, PurchaseRepository purchaseRepository, TokenHandler tokenHandler) {
         this.userRepository = userRepository;
         this.authenticate = authenticate;
         this.requestRepository = requestRepository;
         this.supplyRepository = supplyRepository;
         this.purchaseRepository = purchaseRepository;
+        this.tokenHandler = tokenHandler;
     }
 
     public boolean authenticateAdmin(User user) {
@@ -53,10 +55,9 @@ public class AdminService {
         return authenticate.checkPassword(user.getPassword(), existingUser.getPassword());
     }
 
-    public boolean addEmployee(User employee) {
-        if (!employee.getRole().equals(Role.EMPLOYEE)) {
-            throw new RuntimeException("Admin can only add employees");
-        }
+    public boolean addEmployee(User employee, String token) {
+        employee.setRole(Role.EMPLOYEE);
+        employee.setFranchiseId(userRepository.getUserById(tokenHandler.extractUserId(token)).getFranchiseId());
         employee.setPassword(authenticate.encodePassword(employee.getPassword()));
         return userRepository.addUser(employee);
     }
@@ -65,7 +66,8 @@ public class AdminService {
         return userRepository.deleteUser(employeeId);
     }
 
-    public boolean addRequest(Request request) {
+    public boolean addRequest(Request request, String token) {
+        request.setFranchiseId(userRepository.getUserById(tokenHandler.extractUserId(token)).getFranchiseId());
         request.setStatus(Status.PENDING);
         return requestRepository.addRequest(request);
     }
