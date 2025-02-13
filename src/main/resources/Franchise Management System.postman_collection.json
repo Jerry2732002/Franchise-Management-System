@@ -1,0 +1,559 @@
+{
+	"info": {
+		"_postman_id": "0c46f12f-2205-4419-a34e-1d208e0b1c12",
+		"name": "Franchise Management System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28268980"
+	},
+	"item": [
+		{
+			"name": "Add Stock",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=MjREQkYwRTk4RDAzOTg1QkFGRTFEMzczRDE4NDY1RTl+U0FETUlOMDAxflNBRE1JTn4xNzM5MTg0Mzc5NTQ0fjNtN1kvd1dsWmtPMkdmT051dEVkOXhDeXlKL2FMTXZ4WCs1WFM0SDVKU2c9",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"franchiseId\":1,\r\n    \"productId\":1,\r\n    \"quantity\":6\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/super-admin/add-stock",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"add-stock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a  franchise",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=+U0FETUlOMDAxflNBRE1JTn4xNzM5MTgzMTQ0ODE3fjUwdTQ1SSs0WFBSSWVRaDRidnBiRFNXWXlSWWxSaFJZYkQ1Y1Vob3ZaeVk9",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"location\":\"Edapally\",\r\n    \"buildingName\":\"Lulu Mall\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/super-admin/add-franchise",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"add-franchise"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Franchise",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/franchise?id=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"franchise"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SuperAdminLogin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":\"SADMIN001\",\r\n    \"password\":\"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/super-admin/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Admin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=NkQyMUUwMzYzM0VFMzAxQ0RDM0ExRTc4RTJDRkI5Qjl+U0FETUlOMDAxflNBRE1JTn4xNzM5MTgzMTQ0ODE3fjUwdTQ1SSs0WFBSSWVRaDRidnBiRFNXWXlSWWxSaFJZYkQ1Y1Vob3ZaeVk9",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":\"JSN001\",\r\n    \"name\":\"Jerry Sebastian\",\r\n    \"password\":\"1234\",\r\n    \"franchiseId\":1,\r\n    \"role\":\"ADMIN\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/super-admin/register-user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"register-user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Product",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=N0Q3MzAxNjc5QTQzMTY4N0YzRjhDOEVCODZCMTczQjR+U0FETUlOMDAxflNBRE1JTn4xNzM5MzU2MzU2NjgxfjQyS1RMWTR0R0tabXlIclhYdzFaRnE4QTNkbzVMb0x3VnJCMFZGVmtNd2M9",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"productName\":\"Iphone 16 Pro\",\r\n    \"productCompany\":\"Apple\",\r\n    \"wholesalePrice\":\"40000\",\r\n    \"distributorPrice\":\"44000\",\r\n    \"retailPrice\":\"50000\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/super-admin/add-product",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"add-product"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Company Purchase",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=N0Q3MzAxNjc5QTQzMTY4N0YzRjhDOEVCODZCMTczQjR+U0FETUlOMDAxflNBRE1JTn4xNzM5MzU2MzU2NjgxfjQyS1RMWTR0R0tabXlIclhYdzFaRnE4QTNkbzVMb0x3VnJCMFZGVmtNd2M9",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/super-admin/company-purchase?id=3&quantity=100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"company-purchase"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "3"
+						},
+						{
+							"key": "quantity",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AdminLogin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":\"JSN001\",\r\n    \"password\":\"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/admin/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Employee",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=M0ExODEzNTY3NkZCOEFGNEMzQUI5Mjg2NzNCNjE4ODl+SlNOMDAxfkFETUlOfjE3MzkyNDczMjg5ODR+YldLVjArQ0tiTVN6RUFGdEFVajBYeEkzVDZEaVhCM1BhYmMwbDgrWFYvYz0=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":\"TAF001\",\r\n    \"name\":\"Thasleena Ashraf\",\r\n    \"password\":\"1234\",\r\n    \"franchiseId\":1,\r\n    \"role\":\"EMPLOYEE\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/admin/register-employee",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"register-employee"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Stock",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=QjFGQzE4NjRDQjVGOTMwRjhBQTQ5NUEzRUU4RkYxQzJ+SlNOMDAxfkFETUlOfjE3MzkzNTY5NDU3Mzh+RllLYUwrNFNrRFpDOGpLTGQvVWxhNkVaUEhPTkNDem02aDk4Z3J5R3Avdz0=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"franchiseId\":1,\r\n    \"productId\":3,\r\n    \"quantity\":130\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/admin/request-stock",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admin",
+						"request-stock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Employee Login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\":\"TAF001\",\r\n    \"password\":\"1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/employee/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"employee",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Available Stock",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=RTVFODcyMzk2Mzk4NDQzM0M0NDk5QjQ1RDc0NzQyOTF+VEFGMDAxfkVNUExPWUVFfjE3MzkyNTYyODcxMjN+clMyaEpwSmVDSzZ0Q2d6MXArNmZlNEs5WVB5SzA1dG9uZVZTSGRQcStuND0=",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/employee/available-stocks?id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"employee",
+						"available-stocks"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bill Purchase",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=MTI4QTkwNkMyNjYwMTNCMUYwMTZEMTgxQUE0RDdBNEZ+VEFGMDAxfkVNUExPWUVFfjE3MzkzNjA5MzU1OTZ+WmN1SXVwOHFKWDRYV21zQjF6a1gvdWpiMHJRY0ZrVmZKR1VBa3ovY3dwaz0=",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"productId\":2,\r\n    \"userId\":\"TAF001\",\r\n    \"quantity\":10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/employee/bill",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"employee",
+						"bill"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Request",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=NTcwM0Q1MEQ3RDAxRjcxOUU4NURCRENBODY4RTA4MDl+U0FETUlOMDAxflNBRE1JTn4xNzM5MjY1MDg3NTAzfllObGJ0eFFjY1lGSllWMWtDSWFFUUo0VVA3emFoUlR0SWRRRWVvSjlnQTA9",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/super-admin/view-request",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"view-request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Accept Request",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=NzczQUY2N0FCOUY0Rjc2QTAyRjczQzU5QzU4QUEzNTJ+U0FETUlOMDAxflNBRE1JTn4xNzM5MzU3MDgyNzMwfkJMZUJVQjFCT0JKZlFjVVNTc05kUWR4VFJNb3dZMDBpWjFpZ3lWK2VpeE09",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/super-admin/accept-request?id=4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"accept-request"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "download company report",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "token=QzcyMDlGODJEODdEMzMxODI4QjgyQTlGOTBFRDE4RjZ+U0FETUlOMDAxflNBRE1JTn4xNzM5MjY5OTU3MTU0fm9JOTFVdU1BOUJWU0IzM1hHc3NSQWMwVEh5c0RLNFA4UllBYkxyT2JobGM9",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/super-admin/download-company-report?start=2025-02-11&end=2025-02-11",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"super-admin",
+						"download-company-report"
+					],
+					"query": [
+						{
+							"key": "start",
+							"value": "2025-02-11"
+						},
+						{
+							"key": "end",
+							"value": "2025-02-11"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
