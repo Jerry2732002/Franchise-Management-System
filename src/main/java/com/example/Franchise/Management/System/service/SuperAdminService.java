@@ -109,11 +109,17 @@ public class SuperAdminService {
     }
 
     public boolean updateRequest(int requestId, Status status) {
+        Request request = requestRepository.getRequestById(requestId);
+
+        if (request.getStatus().equals(Status.ACCEPTED) || request.getStatus().equals(Status.REJECTED)) {
+            throw new RuntimeException("This request is already accepted/ rejected");
+        }
+
         if (status.equals(Status.REJECTED)) {
             return requestRepository.updateRequestStatus(requestId, status);
         }
 
-        Request request = requestRepository.getRequestById(requestId);
+
         CompanyStock existingCompanyStock = companyStockRepository.getCompanyStockById(request.getProductId());
         int companyStockQuantity = existingCompanyStock.getQuantity();
 
