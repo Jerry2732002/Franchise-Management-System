@@ -69,19 +69,33 @@ public class EmployeeController {
     }
 
     @PostMapping("bill")
-    public ResponseEntity<Map<String,String>> billPurchase(@CookieValue("token") String token, @RequestBody Purchases purchases) {
+    public ResponseEntity<Map<String, String>> billPurchase(@CookieValue("token") String token, @RequestBody List<Purchases> purchases) {
         validateUser(token);
 
-        purchases.setUserId(tokenHandler.extractUserId(token));
+        Map<String, String> response = new HashMap<>();
+        String userId = tokenHandler.extractUserId(token);
+        purchases.forEach(purchase -> purchase.setUserId(userId));
+        if (employeeService.billPurchase(purchases)) {
+            response.put("message", "Purchase added successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            response.put("message", "Failed to add purchase");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("return")
+    public ResponseEntity<Map<String, String>> returnPurchase(@CookieValue("token") String token, @RequestBody List<Integer> purchaseIds) {
+        validateUser(token);
 
         Map<String, String> response = new HashMap<>();
 
-        if (employeeService.billPurchase(purchases)) {
-            response.put("message","Purchase added successfully");
-            return new ResponseEntity<>(response,HttpStatus.OK);
+        if (employeeService.returnPurchase(purchaseIds)) {
+            response.put("message", "Purchase returned successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
-            response.put("message","Failed to add purchase");
-            return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+            response.put("message", "Failed to return purchase");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 }

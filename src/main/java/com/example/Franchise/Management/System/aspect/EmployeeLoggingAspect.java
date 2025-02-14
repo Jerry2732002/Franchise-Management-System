@@ -11,6 +11,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Aspect
 @Component
 public class EmployeeLoggingAspect {
@@ -40,8 +42,8 @@ public class EmployeeLoggingAspect {
     public void logAddEmployee(JoinPoint joinPoint, boolean result) {
         if (result) {
             Object[] args = joinPoint.getArgs();
-            Purchases purchases = (Purchases) args[0];
-            logger.info("Added New Purchase::Product ID: {}::Quantity: {}", purchases.getProductId(), purchases.getQuantity());
+            List<Purchases> purchases = (List<Purchases>) args[0];
+            logger.info("Added New Purchase::No of Product: {}", purchases.size());
         } else {
             logger.error("Failed To Add New Purchase");
         }

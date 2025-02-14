@@ -4,16 +4,12 @@ public class Product {
     private int productId;
     private String productName;
     private String productCompany;
-    private double wholesalePrice;
-    private double distributorPrice;
     private double retailPrice;
 
-    public Product(int productId, String productName, String productCompany, double wholesalePrice, double distributorPrice, double retailPrice) {
+    public Product(int productId, String productName, String productCompany, double retailPrice) {
         this.productId = productId;
         this.productName = productName;
         this.productCompany = productCompany;
-        this.wholesalePrice = wholesalePrice;
-        this.distributorPrice = distributorPrice;
         this.retailPrice = retailPrice;
     }
 
@@ -36,21 +32,6 @@ public class Product {
         this.retailPrice = retailPrice;
     }
 
-    public double getDistributorPrice() {
-        return distributorPrice;
-    }
-
-    public void setDistributorPrice(double distributorPrice) {
-        this.distributorPrice = distributorPrice;
-    }
-
-    public double getWholesalePrice() {
-        return wholesalePrice;
-    }
-
-    public void setWholesalePrice(double wholesalePrice) {
-        this.wholesalePrice = wholesalePrice;
-    }
 
     public String getProductCompany() {
         return productCompany;
@@ -68,5 +49,3 @@ public class Product {
         this.productName = productName;
     }
 }
-
-

@@ -203,11 +203,11 @@ public class SuperAdminController {
     }
 
     @PostMapping("company-purchase")
-    public ResponseEntity<Map<String, String>> companyPurchase(@CookieValue("token") String token, @RequestParam("id") int productId, @RequestParam("quantity") int quantity) {
+    public ResponseEntity<Map<String, String>> companyPurchase(@CookieValue("token") String token, @RequestBody()CompanyPurchase purchase) {
         validateUser(token);
 
         Map<String, String> response = new HashMap<>();
-        if (superAdminService.addCompanyPurchase(productId, quantity)) {
+        if (superAdminService.addCompanyPurchase(purchase)) {
             response.put("message", "Company Purchase added successfully");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {

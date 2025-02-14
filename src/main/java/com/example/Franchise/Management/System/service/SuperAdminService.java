@@ -164,10 +164,12 @@ public class SuperAdminService {
     }
 
 
-    public boolean addCompanyPurchase(int productId, int quantity) {
-        if (companyPurchaseRepository.addPurchase(new CompanyPurchase(productId, quantity, new Date(System.currentTimeMillis())))) {
-            CompanyStock existingCompanyStock = companyStockRepository.getCompanyStockById(productId);
-            return companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(productId, existingCompanyStock.getQuantity() + quantity));
+    public boolean addCompanyPurchase(CompanyPurchase purchase) {
+        purchase.setDateOfPurchase(new Date(System.currentTimeMillis()));
+
+        if (companyPurchaseRepository.addPurchase(purchase)) {
+            CompanyStock existingCompanyStock = companyStockRepository.getCompanyStockById(purchase.getProductId());
+            return companyStockRepository.addOrUpdateCompanyStock(new CompanyStock(purchase.getProductId(), existingCompanyStock.getQuantity() + purchase.getQuantity()));
         }
         return false;
     }

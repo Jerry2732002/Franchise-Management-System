@@ -15,11 +15,13 @@ public class PurchaseRowMapper implements RowMapper<Purchases> {
                 rs.getString("product_name"),
                 rs.getString("product_company"),
                 rs.getInt("quantity"),
+                rs.getInt("franchise_id"),
                 rs.getString("location"),
                 rs.getString("building_name"),
                 rs.getString("user_id"),
                 rs.getString("user_name"),
-                rs.getDate("date_of_purchase")
+                rs.getDate("date_of_purchase"),
+                rs.getBoolean("returned")
                 );
     }
 }

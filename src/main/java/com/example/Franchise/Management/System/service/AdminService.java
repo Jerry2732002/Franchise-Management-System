@@ -91,7 +91,7 @@ public class AdminService {
         sellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"Product Name", "Product Company", "Quantity", "Supply Purchase Date", "Price", "Total Price", "Buy/Sell"};
+        String[] headers = {"Product Name", "Product Company", "Quantity", "Date", "Price", "Total Price", "Buy/Sell"};
 
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);

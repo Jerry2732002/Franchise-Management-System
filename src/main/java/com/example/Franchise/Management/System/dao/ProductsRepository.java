@@ -19,9 +19,9 @@ public class ProductsRepository {
     }
 
     public boolean addProduct(Product product) {
-        String sql = "INSERT INTO products (product_name, product_company, wholesale_price, distributor_price, retail_price) VALUE (?,?,?,?,?)";
+        String sql = "INSERT INTO products (product_name, product_company, retail_price) VALUE (?,?,?)";
 
-        int rowsAffected = jdbcTemplate.update(sql,product.getProductName(),product.getProductCompany(),product.getWholesalePrice(), product.getDistributorPrice(), product.getRetailPrice());
+        int rowsAffected = jdbcTemplate.update(sql, product.getProductName(), product.getProductCompany(), product.getRetailPrice());
 
         return rowsAffected == 1;
     }

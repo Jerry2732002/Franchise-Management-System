@@ -15,7 +15,9 @@ public class CompanyPurchaseRowMapper implements RowMapper<CompanyPurchase> {
                 rs.getString("product_name"),
                 rs.getString("product_company"),
                 rs.getInt("quantity"),
-                rs.getDate("date_of_purchase")
+                rs.getDate("date_of_purchase"),
+                rs.getDouble("wholesale_price"),
+                rs.getDouble("distributor_price")
         );
     }
 }

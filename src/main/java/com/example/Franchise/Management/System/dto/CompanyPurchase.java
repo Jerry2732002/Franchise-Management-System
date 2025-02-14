@@ -9,17 +9,21 @@ public class CompanyPurchase {
     private String productCompany;
     private int quantity;
     private Date dateOfPurchase;
+    private double wholesalePrice;
+    private double distributorPrice;
 
     public CompanyPurchase() {
     }
 
-    public CompanyPurchase(int companyPurchaseId,int productId, String productName, String productCompany, int quantity, Date dateOfPurchase) {
+    public CompanyPurchase(int companyPurchaseId, int productId, String productName, String productCompany, int quantity, Date dateOfPurchase, double wholesalePrice, double distributorPrice) {
         this.companyPurchaseId = companyPurchaseId;
         this.productId = productId;
         this.productName = productName;
         this.productCompany = productCompany;
         this.quantity = quantity;
         this.dateOfPurchase = dateOfPurchase;
+        this.wholesalePrice = wholesalePrice;
+        this.distributorPrice = distributorPrice;
     }
 
     public CompanyPurchase(int productId, int quantity, Date dateOfPurchase) {
@@ -74,5 +78,22 @@ public class CompanyPurchase {
 
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+
+    public double getWholesalePrice() {
+        return wholesalePrice;
+    }
+
+    public void setWholesalePrice(double wholesalePrice) {
+        this.wholesalePrice = wholesalePrice;
+    }
+
+    public double getDistributorPrice() {
+        return distributorPrice;
+    }
+
+    public void setDistributorPrice(double distributorPrice) {
+        this.distributorPrice = distributorPrice;
     }
 }

@@ -11,8 +11,11 @@ import com.example.Franchise.Management.System.exception.UnauthorizedException;
 import com.example.Franchise.Management.System.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -49,27 +52,63 @@ public class EmployeeService {
         return stockRepository.getAllStock(franchiseId);
     }
 
-    public boolean billPurchase(Purchases purchase) {
-        purchase.setDateOfPurchase(new Date(System.currentTimeMillis()));
-        User employee = userRepository.getUserById(purchase.getUserId());
+    @Transactional
+    public boolean billPurchase(List<Purchases> purchases) {
+        boolean result = true;
+        for (Purchases purchase : purchases) {
+            purchase.setDateOfPurchase(new Date(System.currentTimeMillis()));
+            User employee = userRepository.getUserById(purchase.getUserId());
 
-        if (employee == null) {
-            throw new RuntimeException("No employee: " + purchase.getUserId() + " exist");
+            if (employee == null) {
+                throw new RuntimeException("No employee: " + purchase.getUserId() + " exist");
+            }
+
+            Stock stock = stockRepository.getStockById(purchase.getProductId(), employee.getFranchiseId());
+
+            if (stock == null) {
+                throw new RuntimeException("Stock does not exist for product");
+            }
+
+            if (stock.getQuantity() < purchase.getQuantity()) {
+                throw new OutOfStockException("Out of stock");
+            }
+
+            stock.setQuantity(stock.getQuantity() - purchase.getQuantity());
+            stockRepository.addOrUpdateStock(stock);
+
+            result = result && purchaseRepository.addPurchase(purchase);
         }
+        return result;
+    }
 
-        Stock stock = stockRepository.getStockById(purchase.getProductId(), employee.getFranchiseId());
+    @Transactional
+    public boolean returnPurchase(List<Integer> purchaseIds) {
+        boolean result = true;
+        for (int purchaseId : purchaseIds) {
+            Purchases purchase = purchaseRepository.getPurchasesById(purchaseId);
 
-        if (stock == null) {
-            throw new RuntimeException("Stock does not exist for product");
+            if (purchase == null) {
+                throw new RuntimeException("Purchase with ID: " + purchaseId + " not found");
+            }
+
+            if (purchase.isReturned()) {
+                throw new RuntimeException("Purchase ID " + purchase.getPurchaseId() + ", product already returned");
+            }
+            Instant currentInstant = Instant.now();
+            Instant purchaseInstant = purchase.getDateOfPurchase().toInstant();
+            Duration duration = Duration.between(currentInstant, purchaseInstant);
+            if (duration.toDays() > 5) {
+                throw new RuntimeException("Cannot return product. return date exceeded");
+            }
+
+            Stock stock = stockRepository.getStockById(purchase.getProductId(), purchase.getFranchiseId());
+
+            stock.setQuantity(stock.getQuantity() + purchase.getQuantity());
+
+            stockRepository.addOrUpdateStock(stock);
+
+            result = result && purchaseRepository.updateReturned(purchase.getPurchaseId());
         }
-
-        if (stock.getQuantity() < purchase.getQuantity()) {
-            throw new OutOfStockException("Out of stock");
-        }
-
-        stock.setQuantity(stock.getQuantity() - purchase.getQuantity());
-        stockRepository.addOrUpdateStock(stock);
-
-        return purchaseRepository.addPurchase(purchase);
+        return result;
     }
 }
