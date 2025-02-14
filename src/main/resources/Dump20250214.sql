@@ -27,8 +27,10 @@ CREATE TABLE `company_purchases` (
   `product_id` int DEFAULT NULL,
   `quantity` int DEFAULT NULL,
   `date_of_purchase` date DEFAULT NULL,
+  `wholesale_price` double DEFAULT NULL,
+  `distributor_price` double DEFAULT NULL,
   PRIMARY KEY (`company_purchase_id`),
-  KEY `product_id` (`product_id`),
+  UNIQUE KEY `unique_product_date` (`product_id`,`date_of_purchase`),
   CONSTRAINT `company_purchases_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -39,7 +41,7 @@ CREATE TABLE `company_purchases` (
 
 LOCK TABLES `company_purchases` WRITE;
 /*!40000 ALTER TABLE `company_purchases` DISABLE KEYS */;
-INSERT INTO `company_purchases` VALUES (9,1,100,'2025-02-12'),(10,2,100,'2025-02-12'),(11,3,100,'2025-02-12');
+INSERT INTO `company_purchases` VALUES (9,1,100,'2025-02-12',NULL,NULL),(10,2,100,'2025-02-12',NULL,NULL),(11,3,100,'2025-02-12',NULL,NULL);
 /*!40000 ALTER TABLE `company_purchases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -64,7 +66,7 @@ CREATE TABLE `company_stocks` (
 
 LOCK TABLES `company_stocks` WRITE;
 /*!40000 ALTER TABLE `company_stocks` DISABLE KEYS */;
-INSERT INTO `company_stocks` VALUES (1,50),(2,20),(3,100);
+INSERT INTO `company_stocks` VALUES (1,50),(2,20),(3,0);
 /*!40000 ALTER TABLE `company_stocks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,7 +83,7 @@ CREATE TABLE `franchises` (
   `building_name` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`franchise_id`),
   UNIQUE KEY `location` (`location`,`building_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +92,7 @@ CREATE TABLE `franchises` (
 
 LOCK TABLES `franchises` WRITE;
 /*!40000 ALTER TABLE `franchises` DISABLE KEYS */;
-INSERT INTO `franchises` VALUES (1,'Edapally','Lulu Mall');
+INSERT INTO `franchises` VALUES (1,'Edapally','Lulu Mall'),(2,'Thodupuzha','Cental Mall');
 /*!40000 ALTER TABLE `franchises` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -105,8 +107,6 @@ CREATE TABLE `products` (
   `product_id` int NOT NULL AUTO_INCREMENT,
   `product_name` varchar(50) DEFAULT NULL,
   `product_company` varchar(50) DEFAULT NULL,
-  `wholesale_price` double DEFAULT NULL,
-  `distributor_price` double DEFAULT NULL,
   `retail_price` double DEFAULT NULL,
   PRIMARY KEY (`product_id`),
   UNIQUE KEY `product_name` (`product_name`,`product_company`)
@@ -119,7 +119,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'S24','Samsung',10000,12000,15000),(2,'iPhone 16','Apple',15000,17000,20000),(3,'IdeaPad Slim3','Lenovo',30000,40000,46000),(4,'Redmi 16','Xiomi',10000,20000,30000),(16,'Iphone 16 Pro','Apple',40000,44000,50000);
+INSERT INTO `products` VALUES (1,'S24','Samsung',NULL),(2,'iPhone 16','Apple',NULL),(3,'IdeaPad Slim3','Lenovo',NULL),(4,'Redmi 16','Xiomi',NULL),(16,'Iphone 16 Pro','Apple',NULL);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -136,12 +136,13 @@ CREATE TABLE `purchases` (
   `user_id` varchar(20) DEFAULT NULL,
   `quantity` int DEFAULT NULL,
   `date_of_purchase` date DEFAULT NULL,
+  `returned` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`purchase_id`),
   KEY `product_id` (`product_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `purchases_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`),
   CONSTRAINT `purchases_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,7 +151,7 @@ CREATE TABLE `purchases` (
 
 LOCK TABLES `purchases` WRITE;
 /*!40000 ALTER TABLE `purchases` DISABLE KEYS */;
-INSERT INTO `purchases` VALUES (2,1,'TAF001',1,'2025-02-12'),(3,1,'TAF001',1,'2025-02-12'),(4,1,'TAF001',1,'2025-02-12'),(5,1,'TAF001',1,'2025-02-12'),(6,1,'TAF001',4,'2025-02-12'),(7,1,'TAF001',6,'2025-02-12'),(8,2,'TAF001',10,'2025-02-12');
+INSERT INTO `purchases` VALUES (2,1,'TAF001',1,'2025-02-12',0),(3,1,'TAF001',1,'2025-02-12',0),(4,1,'TAF001',1,'2025-02-12',0),(5,1,'TAF001',1,'2025-02-12',0),(6,1,'TAF001',4,'2025-02-12',0),(7,1,'TAF001',6,'2025-02-12',0),(8,2,'TAF001',10,'2025-02-12',1),(9,1,'TAF001',10,'2025-02-14',1),(10,2,'TAF001',10,'2025-02-14',1),(11,3,'TAF001',10,'2025-02-14',1),(12,1,'TAF001',10,'2025-02-14',1),(13,2,'TAF001',10,'2025-02-14',1),(14,3,'TAF001',10,'2025-02-14',1),(15,2,'TAF001',10,'2025-02-14',0),(16,3,'TAF001',10,'2025-02-14',0),(19,2,'TAF001',5,'2025-02-14',0),(20,3,'TAF001',5,'2025-02-14',0),(21,1,'TAF001',5,'2025-02-14',0);
 /*!40000 ALTER TABLE `purchases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -172,7 +173,7 @@ CREATE TABLE `requests` (
   KEY `product_id` (`product_id`),
   CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`franchise_id`) REFERENCES `franchises` (`franchise_id`) ON DELETE CASCADE,
   CONSTRAINT `requests_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -181,7 +182,7 @@ CREATE TABLE `requests` (
 
 LOCK TABLES `requests` WRITE;
 /*!40000 ALTER TABLE `requests` DISABLE KEYS */;
-INSERT INTO `requests` VALUES (2,1,1,50,'ACCEPTED'),(3,1,2,80,'ACCEPTED'),(4,1,3,130,'REJECTED');
+INSERT INTO `requests` VALUES (2,1,1,50,'ACCEPTED'),(3,1,2,80,'ACCEPTED'),(4,1,3,130,'REJECTED'),(5,1,3,30,'PARTIALLY_ACCEPTED');
 /*!40000 ALTER TABLE `requests` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -208,7 +209,7 @@ CREATE TABLE `sessions` (
 
 LOCK TABLES `sessions` WRITE;
 /*!40000 ALTER TABLE `sessions` DISABLE KEYS */;
-INSERT INTO `sessions` VALUES ('DB77B278DD06C6C6C56EC6FF0C301C3D','JSN001'),('7615F8BF06BF887F1D5887A2F8CB6D0C','SADMIN001'),('128A906C266013B1F016D181AA4D7A4F','TAF001');
+INSERT INTO `sessions` VALUES ('E170BB691C659F0A447168F410F3A578','JSN001'),('5B07C9E09B2C7C8D6AC437016799FFBA','SADMIN001'),('0C9D8E9EC3B67DF516B52F75A63F4272','TAF001');
 /*!40000 ALTER TABLE `sessions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -236,7 +237,7 @@ CREATE TABLE `stocks` (
 
 LOCK TABLES `stocks` WRITE;
 /*!40000 ALTER TABLE `stocks` DISABLE KEYS */;
-INSERT INTO `stocks` VALUES (1,1,36),(1,2,70);
+INSERT INTO `stocks` VALUES (1,1,56),(1,2,85),(1,3,95);
 /*!40000 ALTER TABLE `stocks` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -258,7 +259,7 @@ CREATE TABLE `supply` (
   KEY `product_id` (`product_id`),
   CONSTRAINT `supply_ibfk_1` FOREIGN KEY (`franchise_id`) REFERENCES `franchises` (`franchise_id`),
   CONSTRAINT `supply_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -267,7 +268,7 @@ CREATE TABLE `supply` (
 
 LOCK TABLES `supply` WRITE;
 /*!40000 ALTER TABLE `supply` DISABLE KEYS */;
-INSERT INTO `supply` VALUES (4,1,1,50,'2025-02-12'),(5,1,2,80,'2025-02-12');
+INSERT INTO `supply` VALUES (4,1,1,50,'2025-02-12'),(5,1,2,80,'2025-02-12'),(8,1,3,100,'2025-02-13');
 /*!40000 ALTER TABLE `supply` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -309,4 +310,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-02-12 18:16:53
+-- Dump completed on 2025-02-14 18:00:47
